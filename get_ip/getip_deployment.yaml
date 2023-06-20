@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: getip-deployment
+  labels:
+    app: dig
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dig
+  template:
+    metadata:
+      labels:
+        app: dig
+    spec:
+      containers:
+      - name: dig
+        image: ethomatos/getip:latest
