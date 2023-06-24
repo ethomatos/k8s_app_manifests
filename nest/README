@@ -1,0 +1,8 @@
+The Dockerfile uses a pure Python container with requirements for the modules needed.
+Then the container runs the Python script and places the script and requirements and
+required token file inside the container filesystem.
+
+The Dockerfile.old uses an Alpine Linux OS container to run the Python script as if
+it was being hosted in a Linux system, only it runs as a container using crontab.
+In this use case, the init.vars and token file are used inside the Linux container
+and the Python scripts reads in the files.

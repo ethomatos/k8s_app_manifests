@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nest-test-deployment
+  labels:
+    app: nest-test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nest-test
+  template:
+    metadata:
+      labels:
+        app: nest-test
+    spec:
+      containers:
+      - name: nest-test
+        image: ethomatos/nest:v9
+        env:
+        - name: API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: datadog-secret
+              key: api-key
+        - name: APP_KEY
+          valueFrom:
+            secretKeyRef:
+              name: datadog-secret
+              key: app-key
+        - name: CLIENTID
+          valueFrom:
+            secretKeyRef:
+              name: nest-initvars-secret
+              key: clientID
+        - name: CLIENTSECRET
+          valueFrom:
+            secretKeyRef:
+              name: nest-initvars-secret
+              key: clientSecret
+        - name: PROJECTID
+          valueFrom:
+            secretKeyRef:
+              name: nest-initvars-secret
+              key: projectID
+        - name: REFRESHTOKEN
+          valueFrom:
+            secretKeyRef:
+              name: nest-initvars-secret
+              key: refreshToken

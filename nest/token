@@ -1,0 +1,6 @@
+{
+  "access_token": "ya29.a0AWY7Ckm123uTbAUQ8FudQsGYkgR-d3Cr2ZAXbBaSXxhPj74tHK_uoR6daQ8H_q2PCwY65FEmUfISzdJf7IezQo4j0kvgCjz3UAHFLF9k26y0WDTALzRjYpA2iYq-5knwiWmQPFLbLRAhx6URNXA46krRk9Y4scKmWAaCgYKAb4SARISFQG1tDrpAWSy9V2eSt5rTQ6uQbvbrg0169",
+  "expires_in": 3599,
+  "scope": "https://www.googleapis.com/auth/sdm.service",
+  "token_type": "Bearer"
+}

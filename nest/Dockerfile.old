@@ -1,0 +1,21 @@
+FROM alpine:latest
+
+WORKDIR ./
+COPY token ./
+COPY gcpNestRead.py ./
+
+RUN apk update
+RUN apk add vim
+RUN ln -sf vim /usr/bin/vi
+RUN apk add --update --no-cache python3 py3-pip
+RUN ln -sf python3 /usr/bin/python
+RUN pip3 install --no-cache --upgrade pip setuptools
+RUN apk add bind-tools
+RUN pip3 install --no-cache datadog
+
+RUN crontab -l > /tmp/out
+RUN echo "*/2 * * * * python3 /gcpNestRead.py -i /token" >> /tmp/out
+RUN crontab - < /tmp/out
+
+CMD ["crond", "-f" ]
+#CMD ["sleep", "infinity"]
