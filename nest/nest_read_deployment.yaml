@@ -34,6 +34,10 @@ spec:
           value: "nest"
         - name: DD_VERSION
           value: "4.0"
+        - name: DD_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
         - name: API_KEY
           valueFrom:
             secretKeyRef:
