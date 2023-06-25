@@ -1,7 +1,9 @@
-import http.client
 from urllib.parse import urlparse
 from argparse import ArgumentParser
 from datadog import initialize, api, statsd
+#from ddtrace import tracer
+#from flask import Flask
+import http.client
 import json
 import time
 import os
@@ -64,7 +66,7 @@ def queryAPI(tokenfile, accessToken):
 	return(data.decode("utf-8"))
 
 # Main routine of the program
-def main(tokenfile):
+def main():
 	if (debug): print("In main")
 	options = {
 		'api_key': os.getenv('API_KEY'),
@@ -83,13 +85,12 @@ def main(tokenfile):
 		try:
 			if (debug): print("In try block")
 			# re-use previously successful access token, it resets every hour
-			data = json.loads(queryAPI(tokenfile, getToken(tokenfile)))
+			data = json.loads(queryAPI('token', getToken('token')))
 			processQuery(data, statsd)
 		except:
-			main(tokenfile)
+			main()
 		# Wait before continuing with the next query
 		time.sleep(60)
-	exit(0)
 
 def processQuery(data, statsd):
 	log = ''
@@ -113,10 +114,4 @@ def processQuery(data, statsd):
 
 if __name__ == "__main__":
 	if (debug): print("In __name__")
-	parser = ArgumentParser(description='Query Google Nest API for devices.')
-	helpText = "Enter a file to read in the Google Nest API access token.\n"
-	parser.add_argument('-i', help=helpText, required=True)
-	args = parser.parse_args()
-	tokenfile = args.i if args.i else 'token'
-	if (debug): print("Retrieving " + tokenfile)
-	main(tokenfile)
+	main()

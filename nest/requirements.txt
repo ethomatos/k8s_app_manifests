@@ -1,3 +1,5 @@
 http.client
 argparse
 datadog
+ddtrace
+Flask
