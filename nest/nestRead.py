@@ -1,5 +1,5 @@
-from urllib.parse import urlparse
-from argparse import ArgumentParser
+#from urllib.parse import urlparse
+#from argparse import ArgumentParser
 from datadog import initialize, api, statsd
 #from ddtrace import tracer
 #from flask import Flask

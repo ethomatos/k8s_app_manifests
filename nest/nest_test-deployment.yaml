@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: nest-test
-        image: ethomatos/nest:v9
+        image: ethomatos/nest:testing
         env:
         - name: API_KEY
           valueFrom:
