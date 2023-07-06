@@ -1,0 +1,35 @@
+# Source of information:
+https://www.haproxy.com/blog/use-helm-to-install-the-haproxy-kubernetes-ingress-controller/
+
+# Commands to run:
+helm repo add haproxytech https://haproxytech.github.io/helm-charts
+helm repo update
+helm search repo haproxy
+helm install mycontroller haproxytech/kubernetes-ingress
+
+# If TLS is not needed disable it:
+helm install mycontroller haproxytech/kubernetes-ingress --set-string "controller.config.ssl-redirect=false"
+
+# Install as a daemonset:
+helm install mycontroller haproxytech/kubernetes-ingress --set controller.kind=DaemonSet --set controller.daemonset.useHostPort=true
+
+# To configure log forwarding:
+helm install mycontroller haproxytech/kubernetes-ingress \
+  --set-string "controller.config.syslog-server=address:10.105.98.88\,facility:local0\,level:info" \
+  --set-string "controller.config.ssl-redirect=false"
+
+# To use overrides create a yaml file and place these contents inside:
+controller:
+  config:
+    ssl-redirect: "true"
+    syslog-server: "address:10.105.98.88, facility:local0, level:info"
+  defaultTLSSecret:
+    enabled: true
+    secret: default/mycert
+
+# Reference the overrides using the file:
+helm install mycontroller haproxytech/kubernetes-ingress --values overrides.yaml
+
+# For upgrading:
+helm repo update
+helm upgrade mycontroller haproxytech/kubernetes-ingress

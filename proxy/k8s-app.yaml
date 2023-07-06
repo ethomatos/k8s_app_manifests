@@ -1,0 +1,275 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-app
+  namespace: test
+  labels:
+    tags.datadoghq.com/env: elite
+    tags.datadoghq.com/service: flask
+    tags.datadoghq.com/version: "1.0"
+spec:
+  selector:
+    matchLabels:
+      app: flask-app
+  replicas: 4
+  template:
+    metadata:
+      labels:
+        app: flask-app
+        tags.datadoghq.com/env: elite
+        tags.datadoghq.com/service: flask
+        tags.datadoghq.com/version: "1.0"
+        admission.datadoghq.com/enabled: "true"
+      annotations:
+        admission.datadoghq.com/python-lib.version: "v1.6.3"
+    spec:
+      containers:
+        - name: flask-app
+          image: ethomatos/flaskapp
+          ports:
+            - containerPort: 5000
+          env:
+            - name: DD_PROFILING_ENABLED
+              value: "true"
+            - name: DD_LOGS_INJECTION
+              value: "true"
+            - name: DD_TRACE_SAMPLE_RATE
+              value: "1"
+            - name: DD_APPSEC_ENABLED
+              value: "true"
+            - name: DD_TRACE_DEBUG
+              value: "true"
+            - name: DD_AGENT_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bar-app
+  namespace: test
+  labels:
+    tags.datadoghq.com/env: elite
+    tags.datadoghq.com/service: node
+    tags.datadoghq.com/version: "1.0"
+    app: bar-app
+    tier: backend
+spec:
+  selector:
+    matchLabels:
+      app: bar-app
+  replicas: 4
+  template:
+    metadata:
+      labels:
+        app: bar-app
+        tags.datadoghq.com/env: elite
+        tags.datadoghq.com/service: node
+        tags.datadoghq.com/version: "1.0"
+        admission.datadoghq.com/enabled: "true"
+      annotations:
+        admission.datadoghq.com/nodejs-lib.version: v3.9.3
+    spec:
+      containers:
+        - name: bar-app
+          image: ethomatos/k8s-app
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DD_PROFILING_ENABLED
+              value: "true"
+            - name: DD_LOGS_INJECTION
+              value: "true"
+            - name: DD_TRACE_SAMPLE_RATE
+              value: "1"
+            - name: DD_TRACE_DEBUG
+              value: "true"
+            - name: APP_NAME
+              value: BAR
+---  
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ranch-gus-app
+  namespace: test
+  labels:
+    tags.datadoghq.com/env: elite
+    tags.datadoghq.com/service: apache
+    tags.datadoghq.com/version: "1.0"
+    app: ranch-gus-app
+    tier: backend
+spec:
+  selector:
+    matchLabels:
+      app: ranch-gus-app
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: ranch-gus-app
+        tags.datadoghq.com/env: elite
+        tags.datadoghq.com/service: apache
+        tags.datadoghq.com/version: "1.0"
+    spec:
+      containers:
+        - name: ranch-gus-app
+          image: ethomatos/ranch-gus:latest
+          ports:
+            - containerPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: foo-app
+  namespace: test
+  labels:
+    tags.datadoghq.com/env: elite
+    tags.datadoghq.com/service: node
+    tags.datadoghq.com/version: "1.0"
+    app: foo-app
+    tier: backend
+spec:
+  selector:
+    matchLabels:
+      app: foo-app
+  replicas: 4
+  template:
+    metadata:
+      labels:
+        app: foo-app
+        tags.datadoghq.com/env: elite
+        tags.datadoghq.com/service: node
+        tags.datadoghq.com/version: "1.0"
+        admission.datadoghq.com/enabled: "true"
+      annotations:
+        admission.datadoghq.com/nodejs-lib.version: "v3.9.3"
+    spec:
+      containers:
+        - name: foo-app
+          image: ethomatos/k8s-app
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DD_PROFILING_ENABLED
+              value: "true"
+            - name: DD_LOGS_INJECTION
+              value: "true"
+            - name: DD_TRACE_SAMPLE_RATE
+              value: "1"
+            - name: DD_TRACE_DEBUG
+              value: "true"
+            - name: APP_NAME
+              value: FOO
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flask-app-service
+  namespace: test
+  annotations:
+    haproxy.org/check: "enabled"
+    haproxy.org/forwarded-for: "enabled"
+    haproxy.org/load-balance: "roundrobin"
+spec:
+  selector:
+    app: flask-app
+  ports:
+    - name: port-1
+      port: 80
+      protocol: TCP
+      targetPort: 5000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: foo-app-service
+  namespace: test
+  annotations:
+    haproxy.org/check: "enabled"
+    haproxy.org/forwarded-for: "enabled"
+    haproxy.org/load-balance: "roundrobin"
+spec:
+  selector:
+    app: foo-app
+  ports:
+    - name: port-1
+      port: 80
+      protocol: TCP
+      targetPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bar-app-service
+  namespace: test
+  annotations:
+    haproxy.org/check: "enabled"
+    haproxy.org/forwarded-for: "enabled"
+    haproxy.org/load-balance: "roundrobin"
+spec:
+  selector:
+    app: bar-app
+  ports:
+    - name: port-1
+      port: 80
+      protocol: TCP
+      targetPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ranch-gus-service
+  namespace: test
+  annotations:
+    haproxy.org/check: "enabled"
+    haproxy.org/forwarded-for: "enabled"
+    haproxy.org/load-balance: "roundrobin"
+spec:
+  selector:
+    app: ranch-gus-app
+  ports:
+    - name: port-1
+      port: 80
+      protocol: TCP
+      targetPort: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: web-ingress
+  namespace: test
+  annotations: 
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: flask-app-service
+                port:
+                  number: 80
+          - path: /foo
+            pathType: Prefix
+            backend:
+              service:
+                name: foo-app-service
+                port:
+                  number: 80
+          - path: /bar
+            pathType: Prefix
+            backend:
+              service:
+                name: bar-app-service
+                port:
+                  number: 80
+          - path: /ranch
+            pathType: Prefix
+            backend:
+              service:
+                name: ranch-gus-service
+                port:
+                  number: 80
