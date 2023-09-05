@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cputemp-deployment
+  labels:
+    app: cputemp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cputemp
+  template:
+    metadata:
+      labels:
+        app: cputemp
+    spec:
+      containers:
+      - name: cputemp
+        image: ethomatos/cputemp:v3
+        imagePullPolicy: Always
